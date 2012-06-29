@@ -22,11 +22,9 @@ Load a list of contacts performing a GET request without any Id:
 
 ## Tests
 
-To run the tests you have to install [Mocha](http://visionmedia.github.com/mocha/), [should](https://github.com/visionmedia/should.js) and [CoffeeScript](http://coffeescript.org):
+The tests depend on [Mocha](http://visionmedia.github.com/mocha/), [should](https://github.com/visionmedia/should.js) and [CoffeeScript](http://coffeescript.org). Install the depencies with NPM:
 
-    $ npm install mocha
-    $ npm install should
-    $ npm install coffee-script
+    $ npm install .
 
 Execute the tests using make:
 
