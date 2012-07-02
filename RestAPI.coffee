@@ -18,12 +18,14 @@ class RestAPI
   @sid = ''
 
   ###
-  Server instance Url (e.g. https://na1.salesforce.com)
+  Salesforce instance Url (e.g. https://na1.salesforce.com)
   ###
-  @server = ''
+  @instanceUrl = ''
 
   ###
   Function to refresh the SID
+  The function has expects the callback as a parameter
+  and calls it after the session has been refreshed.
   ###
   @authenticator = null
 
@@ -40,14 +42,17 @@ class RestAPI
   @setSID: (sid) -> RestAPI.sid = sid
 
   ###
-  @param server Server Instance Url e.g. https://na1.salesforce.com.
+  @param instanceUrl Server instance Url e.g. https://na1.salesforce.com.
   ###
-  @setServer: (server) -> RestAPI.server = server
+  @setInstanceUrl: (instanceUrl) -> RestAPI.instanceUrl = instanceUrl
 
   ###
   @param authenticator Function to refresh SID after session expired.
   ###
   @setAuthenticator: (authenticator) -> RestAPI.authenticator = authenticator
+
+  @getBaseUrl: ->
+    return RestAPI.instanceUrl + '/services/data/v' + RestAPI.apiVersion + '/'
 
   ###
   Loads a list of MRUs
@@ -56,8 +61,7 @@ class RestAPI
   @param callback Callback function (err, data)
   ###
   @get: (sobject, id, callback) ->
-    url = RestAPI.server
-    url += '/services/data/v' + RestAPI.apiVersion + '/sobjects/' + sobject
+    url = RestAPI.getBaseUrl() + 'sobjects/' + sobject
 
     # Add id if a specific resource is requested.
     if id?
@@ -89,8 +93,7 @@ class RestAPI
   }
   ###
   @create: (sobject, data, callback) ->
-    url = RestAPI.server
-    url += '/services/data/v' + RestAPI.apiVersion + '/sobjects/' + sobject
+    url = RestAPI.getBaseUrl() + 'sobjects/' + sobject
 
     payloadJSON = JSON.stringify data
     RestAPI.ajax url, 'POST', payloadJSON, callback
@@ -103,8 +106,7 @@ class RestAPI
   ###
   @update: (sobject, json, fields, callback) ->
     type = 'PATCH'
-    url = RestAPI.server
-    url += '/services/data/v' + RestAPI.apiVersion + '/sobjects/' + sobject + '/' + json.Id
+    url = RestAPI.getBaseUrl() + 'sobjects/' + sobject + '/' + json.Id
   
     payloadJSON = JSON.stringify fields
     RestAPI.ajax url, type, payloadJSON, callback
@@ -119,8 +121,7 @@ class RestAPI
             WHERE Account.Id = '" + accountId + "' ORDER BY Name"
   ###
   @soql: (query, callback) ->
-    url = RestAPI.server
-    url += '/services/data/v' + RestAPI.apiVersion + '/query'
+    url = RestAPI.getBaseUrl() + 'query'
     RestAPI.ajax url, 'GET', {q:query}, callback
 
   ###
@@ -130,8 +131,7 @@ class RestAPI
   ###
   @search: (searchTerm, callback) ->
     if searchTerm? and searchTerm.length >= 2
-      url = RestAPI.server
-      url += '/services/data/v' + RestAPI.apiVersion + '/search'
+      url = RestAPI.getBaseUrl() + 'search'
       
       searchTerm = searchTerm.replace /([\?&|!{}\[\]\(\)\^~\*:\\"'+-])/g, '\\$1'
       sosq = 'FIND { ' + searchTerm + '* }
@@ -147,7 +147,7 @@ class RestAPI
   ###
   @logout: (callback) ->
     RestAPI.setSID ''
-    RestAPI.setServer ''
+    RestAPI.setInstanceUrl ''
     callback null
 
   ###

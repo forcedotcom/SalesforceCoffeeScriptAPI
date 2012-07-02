@@ -9,19 +9,19 @@ describe 'RestAPI', ->
       RestAPI.setSID 'mySID'
       RestAPI.sid.should.equal 'mySID'
 
-  describe '#setServer()', ->
-    it 'should set the server instance Url', ->
-      RestAPI.server.should.equal ''
-      RestAPI.setServer 'https://na1.salesforce.com'
-      RestAPI.server.should.equal 'https://na1.salesforce.com'
+  describe '#setInstanceUrl()', ->
+    it 'should set the instance Url', ->
+      RestAPI.instanceUrl.should.equal ''
+      RestAPI.setInstanceUrl 'https://na1.salesforce.com'
+      RestAPI.instanceUrl.should.equal 'https://na1.salesforce.com'
 
   describe '#logout()', ->
-    it 'should reset sid and server when called from within a container', (done) ->
+    it 'should reset sid and instanceUrl when called from within a container', (done) ->
       RestAPI.setSID 'mySID'
-      RestAPI.setServer 'https://na1.salesforce.com'
+      RestAPI.setInstanceUrl 'https://na1.salesforce.com'
       RestAPI.logout ->
         RestAPI.sid.should.equal ''
-        RestAPI.server.should.equal ''
+        RestAPI.instanceUrl.should.equal ''
         done()
 
   describe '#search()', ->
@@ -30,7 +30,7 @@ describe 'RestAPI', ->
 
   describe '#get()', ->
     it 'should do a get request on the rest API', (done) ->
-      RestAPI.setServer 'https://na1.salesforce.com'
+      RestAPI.setInstanceUrl 'https://na1.salesforce.com'
       RestAPI.setSID 'mySID'
 
       # Mock ajax call
@@ -42,7 +42,7 @@ describe 'RestAPI', ->
       RestAPI.get RestAPI.ACCOUNT, '001abc'
 
     it 'should do a get request on the rest API for all items (no id)', (done) ->
-      RestAPI.setServer 'https://na1.salesforce.com'
+      RestAPI.setInstanceUrl 'https://na1.salesforce.com'
       RestAPI.setSID 'mySID'
 
       # Mock ajax call
@@ -55,7 +55,7 @@ describe 'RestAPI', ->
 
   describe '#create()', ->
     it 'should do a post request on the rest API', (done) ->
-      RestAPI.setServer 'https://na1.salesforce.com'
+      RestAPI.setInstanceUrl 'https://na1.salesforce.com'
       RestAPI.setSID 'mySID'
 
       payload = { foo:"bar" }
@@ -71,7 +71,7 @@ describe 'RestAPI', ->
 
   describe '#update()', ->
     it 'should do a patch request on the rest API', (done) ->
-      RestAPI.setServer 'https://na1.salesforce.com'
+      RestAPI.setInstanceUrl 'https://na1.salesforce.com'
       RestAPI.setSID 'mySID'
 
       fields = { foo:"bar" }
