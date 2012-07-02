@@ -3,21 +3,16 @@
 Client side API written in CoffeeScript to access the Salesforce [REST APIs on Force.com](http://developer.force.com/REST).
 The API can be used with the [Salesforce Mobile SDK](http://wiki.developerforce.com/page/MobileSDK) for [iOS](https://github.com/forcedotcom/SalesforceMobileSDK-iOS) and [Android](https://github.com/forcedotcom/SalesforceMobileSDK-Android/).
 
-## Usage
+## Docs
 
-### Init
+To create the docs you need [Pygment](http://pygments.org) and [docco](http://jashkenas.github.com/docco).
 
-Example for usage inside of PhoneGap:
-    
-    RestAPI.setInstanceUrl <INSTANCE_URL>
-    RestAPI.setSID <OAUTH_ACCESS_TOKEN>
-    
-### Load list of contacts
+    $ sudo easy_install Pygments
+    $ npm install .
 
-Load a list of contacts performing a GET request without any Id:
-    
-    RestAPI.get RestAPI.CONTACT, null, (result) ->
-      console.log 'Loaded ' + result.length + ' contacts'
+Generate the docs:
+
+    $ make docs
 
 ## Tests
 

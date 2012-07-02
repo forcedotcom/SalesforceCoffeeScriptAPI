@@ -5,4 +5,7 @@ test:
 	--compilers coffee:coffee-script \
 	--reporter $(REPORTER)
 
+docs:
+	./node_modules/.bin/docco *.coffee
+
 .PHONY: test 
