@@ -8,4 +8,8 @@ test:
 docs:
 	./node_modules/.bin/docco *.coffee
 
+push:
+	./node_modules/.bin/docco *.coffee
+	git push origin master
+
 .PHONY: test 
