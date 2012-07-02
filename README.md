@@ -9,7 +9,7 @@ The API can be used with the [Salesforce Mobile SDK](http://wiki.developerforce.
 
 Example for usage inside of PhoneGap:
     
-    RestAPI.setServer <INSTANCE_URL>
+    RestAPI.setInstanceUrl <INSTANCE_URL>
     RestAPI.setSID <OAUTH_ACCESS_TOKEN>
     
 ### Load list of contacts
