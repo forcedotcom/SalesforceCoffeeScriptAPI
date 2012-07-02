@@ -9,15 +9,14 @@ The API can be used with the [Salesforce Mobile SDK](http://wiki.developerforce.
 
 Example for usage inside of PhoneGap:
     
-    SFDC.setContainer true
-    SFDC.setServer <INSTANCE_URL>
-    SFDC.setSID <OAUTH_ACCESS_TOKEN>
+    RestAPI.setServer <INSTANCE_URL>
+    RestAPI.setSID <OAUTH_ACCESS_TOKEN>
     
 ### Load list of contacts
 
 Load a list of contacts performing a GET request without any Id:
     
-    SFDC.get SFDC.CONTACT, null, (result) ->
+    RestAPI.get RestAPI.CONTACT, null, (result) ->
       console.log 'Loaded ' + result.length + ' contacts'
 
 ## Tests
