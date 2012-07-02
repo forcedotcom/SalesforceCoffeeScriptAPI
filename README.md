@@ -13,6 +13,7 @@ To create the docs you need [Pygment](http://pygments.org) and [docco](http://ja
 Generate the docs:
 
     $ make docs
+    $ open docs/RestAPI.html
 
 ## Tests
 
