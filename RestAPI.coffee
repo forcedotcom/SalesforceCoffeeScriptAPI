@@ -1,4 +1,4 @@
-class SFDC
+class RestAPI
 
   ###
   Constants for Salesforce standard objects
@@ -23,11 +23,6 @@ class SFDC
   @server = ''
 
   ###
-  Flag if API us used from within Mobile SDK container
-  ###
-  @isContainer = false
-
-  ###
   Function to refresh the SID
   ###
   @authenticator = null
@@ -39,81 +34,80 @@ class SFDC
   @logFunction = console.log
 
   ###
-  Set the session Id for container usage.
+  Set the session Id.
   @param sid Session Id
   ###
-  @setSID: (sid) -> SFDC.sid = sid
+  @setSID: (sid) -> RestAPI.sid = sid
 
   ###
   @param server Server Instance Url e.g. https://na1.salesforce.com.
   ###
-  @setServer: (server) -> SFDC.server = server
+  @setServer: (server) -> RestAPI.server = server
 
   ###
-  @param isContainer Flag if client is inside a container.
+  @param authenticator Function to refresh SID after session expired.
   ###
-  @setContainer: (isContainer) -> SFDC.isContainer = isContainer
-
-  ###
-  @param authenticatorFn Method to refreshSession on session expiration.
-  ###
-  @setAuthenticator: (authenticatorFn) -> SFDC.authenticator = authenticatorFn
+  @setAuthenticator: (authenticator) -> RestAPI.authenticator = authenticator
 
   ###
   Loads a list of MRUs
-  @param sobjectType Salesforce object. E.g. 'Contact' or 'Account'
+  @param sobject Salesforce object. E.g. 'Contact' or 'Account'
   @param id Optional Id of the record or null to get MRUs
   @param callback Callback function (err, data)
   ###
-  @get: (sobjectType, id, callback) ->
-    url = SFDC.server
-    if SFDC.isContainer
-      url += '/services/data/v' + SFDC.apiVersion
-
-    url += '/sobjects/' + sobjectType
+  @get: (sobject, id, callback) ->
+    url = RestAPI.server
+    url += '/services/data/v' + RestAPI.apiVersion + '/sobjects/' + sobject
 
     # Add id if a specific resource is requested.
     if id?
       url += '/' + id
 
-    SFDC.ajax url, 'GET', null,  callback
+    RestAPI.ajax url, 'GET', null,  callback
 
 
   ###
-  @param sobjectType Salesforce object. E.g. 'Contact' or 'Account'
+  @param sobject Salesforce object. E.g. 'Task' or 'Note'
+  @param data
+  @param callback Callback function (err, data)
+
+  Example
+  sobject: 'Task'
+  data: {
+    'WhatId':'001AccountId',
+    'Subject': 'Some subject',
+    'Description': 'Description text',
+    'Status': 'Completed'
+  }
+
+  sobject: 'Note'
+  data: {
+    'ParentId':'003ContactId',
+    'Title': 'Some title',
+    'Body': 'Body text',
+    'IsPrivate': false
+  }
   ###
-  @create: (sobjectType, data, callback) ->
-    url = SFDC.server
-    if SFDC.isContainer
-      url += '/services/data/v' + SFDC.apiVersion + '/sobjects/' + sobjectType
-    else
-      # Add CSRF token for web-app
-      data._csrf = $('#csrf_token').attr('value')
-      url += '/sobjects/'+sobjectType
+  @create: (sobject, data, callback) ->
+    url = RestAPI.server
+    url += '/services/data/v' + RestAPI.apiVersion + '/sobjects/' + sobject
 
     payloadJSON = JSON.stringify data
-    SFDC.ajax url, 'POST', payloadJSON, callback
+    RestAPI.ajax url, 'POST', payloadJSON, callback
 
   ###
-  @param sobjectType The specified value must be a valid object for your organization. For a complete list of objects, see Standard Objects.
+  @param sobject The specified value must be a valid object for your organization. For a complete list of objects, see Standard Objects.
   @param json JSON of the record to be updated
   @param fields JSON object with fields to be updated
   @param callback Callback function (err, result)
   ###
-  @update: (sobjectType, json, fields, callback) ->
+  @update: (sobject, json, fields, callback) ->
     type = 'PATCH'
-    url = SFDC.server
-    if SFDC.isContainer
-      url += '/services/data/v' + SFDC.apiVersion + '/sobjects/' + sobjectType + '/' + json.Id
-    else
-      # Add CSRF token for web-app
-      fields._csrf = $('#csrf_token').attr('value')
-      # Heroku does not support PATCH so we use POST as a workaround
-      type = 'POST'
-      url += '/sobjects/'+sobjectType+'/' + json.Id
-    
+    url = RestAPI.server
+    url += '/services/data/v' + RestAPI.apiVersion + '/sobjects/' + sobject + '/' + json.Id
+  
     payloadJSON = JSON.stringify fields
-    SFDC.ajax url, type, payloadJSON, callback
+    RestAPI.ajax url, type, payloadJSON, callback
 
   ###
   Performs a Salesforce Object Query
@@ -125,13 +119,9 @@ class SFDC
             WHERE Account.Id = '" + accountId + "' ORDER BY Name"
   ###
   @soql: (query, callback) ->
-    url = SFDC.server
-    if SFDC.isContainer
-      url += '/services/data/v' + SFDC.apiVersion + '/query'
-    else
-      url += '/relatedContacts'
-
-    SFDC.ajax url, 'GET', {q:query}, callback
+    url = RestAPI.server
+    url += '/services/data/v' + RestAPI.apiVersion + '/query'
+    RestAPI.ajax url, 'GET', {q:query}, callback
 
   ###
   Performs a Salesforce Object Search Query
@@ -140,18 +130,15 @@ class SFDC
   ###
   @search: (searchTerm, callback) ->
     if searchTerm? and searchTerm.length >= 2
-      url = SFDC.server
-      if SFDC.isContainer
-        url += '/services/data/v' + SFDC.apiVersion + '/search'
-      else
-        url += '/search'
+      url = RestAPI.server
+      url += '/services/data/v' + RestAPI.apiVersion + '/search'
       
       searchTerm = searchTerm.replace /([\?&|!{}\[\]\(\)\^~\*:\\"'+-])/g, '\\$1'
       sosq = 'FIND { ' + searchTerm + '* }
               IN Name Fields
               RETURNING contact(name, id), account(name, id)'
 
-      SFDC.ajax url, 'GET', {q:sosq}, callback
+      RestAPI.ajax url, 'GET', {q:sosq}, callback
     else
       callback {status: 400}
 
@@ -159,13 +146,9 @@ class SFDC
   @param callback Callback function after logout is complete.
   ###
   @logout: (callback) ->
-    if SFDC.isContainer
-      SFDC.setSID ''
-      SFDC.setServer ''
-      callback null
-    else
-      $.getJSON SFDC.server + '/logout', (data) ->
-        callback data
+    RestAPI.setSID ''
+    RestAPI.setServer ''
+    callback null
 
   ###
   AJAX requests
@@ -173,7 +156,7 @@ class SFDC
   @param type GET, POST, PATCH
   @param callback Callback function (err, data)
   ###
-  @ajax: (url, type, data, callback, ignoreRetry) ->
+  @ajax: (url, type, data, callback, ignoreRetry = false) ->
     logFunction? "ajax #{type}:" + url
 
     $.ajax
@@ -183,9 +166,8 @@ class SFDC
       contentType: 'application/json; charset=utf-8'
       dataType: 'json'
       beforeSend: (xhr) ->
-        if SFDC.isContainer
-          xhr.setRequestHeader 'Accept', 'application/json'
-          xhr.setRequestHeader 'Authorization', 'OAuth ' + SFDC.sid
+        xhr.setRequestHeader 'Accept', 'application/json'
+        xhr.setRequestHeader 'Authorization', 'OAuth ' + RestAPI.sid
       success: (data) ->
         logFunction? 'success ' + data
         callback null, data
@@ -193,11 +175,11 @@ class SFDC
         verbose = JSON.stringify err
         logFunction? 'error ' + verbose
         if err.status is 401 and not ignoreRetry
-          SFDC.authenticator? ->
-            SFDC.ajax url, type, data, callback, true
+          RestAPI.authenticator? ->
+            RestAPI.ajax url, type, data, callback, true
         callback err, null
 
 # Export for client side JavaScript
-window?.SFDC = SFDC
+window?.RestAPI = RestAPI
 # Export for mocha unit test
-module?.exports = SFDC
+module?.exports = RestAPI
