@@ -5,7 +5,8 @@ The API can be used with the [Salesforce Mobile SDK](http://wiki.developerforce.
 
 ## Docs
 
-To create the docs you need [Pygment](http://pygments.org) and [docco](http://jashkenas.github.com/docco).
+Please see the inline docs for the [RestAPI.coffee](http://forcedotcom.github.com/SalesforceCoffeeScriptAPI/docs/RestAPI.html) class.
+To generate the docs you need [Pygment](http://pygments.org) and [docco](http://jashkenas.github.com/docco).
 
     $ sudo easy_install Pygments
     $ npm install .
