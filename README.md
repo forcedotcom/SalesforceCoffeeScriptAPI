@@ -18,7 +18,7 @@ Generate the docs:
 
 ## Tests
 
-The tests depend on [Mocha](http://visionmedia.github.com/mocha/), [should](https://github.com/visionmedia/should.js) and [CoffeeScript](http://coffeescript.org). Install the depencies with NPM:
+The tests depend on [Mocha](https://mochajs.org/), [should](https://github.com/visionmedia/should.js) and [CoffeeScript](http://coffeescript.org). Install the depencies with NPM:
 
     $ npm install .
 
